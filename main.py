@@ -1,4 +1,6 @@
 import numpy as np
+import matplotlib.pyplot as plt
+
 
 N = 64 # Grid size
 dt = 0.1 # Time step
@@ -20,7 +22,7 @@ def set_boundary_conditions(x):
 
 
 def add_source(D0: np.array, S: np.array, dt: float):
-    ''' Add s o u r ce term t o t h e d e n s i t y or velocity grid.
+    ''' Add source term to the density or velocity grid.
     D0 - initial matrix
     S - matrix of sources with shape the same as the initial
     matrix (sources can be applied by e.g. mouse click)
@@ -108,3 +110,6 @@ while True:
     grid = advect(grid, 1, dt)
     grid = advect(grid, 2, dt)
     grid = project(grid)
+    print(grid[:, :, 0])
+    plt.imshow(grid[:, :, 0])
+    plt.show()
