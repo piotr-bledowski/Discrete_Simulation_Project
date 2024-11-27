@@ -40,7 +40,7 @@ def diffuse_gauss_seidel(D0, diff, dt, iterations=20):
     return D
 
 def advect(D0, index_, dt):
-    N = D0.shape[0]
+    #N = D0.shape[0]
     u = D0[:, :, 1]
     v = D0[:, :, 2]
     dt0 = dt * N
@@ -61,11 +61,11 @@ def advect(D0, index_, dt):
 
 def project(D0, iterations=20):
     h = 1 / N
-    N = D0.shape[0]
+    #N = D0.shape[0]
     u = D0[:, :, 1]
     v = D0[:, :, 2]
-    div = np.zeros((D0.shape[:1]))
-    p = np.zeros((D0.shape[:1]))
+    div = np.zeros((D0.shape[:2]))
+    p = np.zeros((D0.shape[:2]))
 
     for i in range(1, N-1):
         for j in range(1, N-1):
@@ -90,3 +90,21 @@ def project(D0, iterations=20):
     set_boundary_conditions(v)
     return D0
 
+
+density_source = np.zeros(grid.shape[:2])
+density_source[0, 0] = 1
+
+while True:
+    # update density
+    grid[:, :, 0] = add_source(grid[:, :, 0], density_source, dt)
+    grid[:, :, 0] = diffuse_gauss_seidel(grid[:, :, 0], diff, dt)
+    grid = advect(grid, 0, dt)
+    # update velocity
+    grid[:, :, 1] = add_source(grid[:, :, 1], density_source, dt)
+    grid[:, :, 2] = add_source(grid[:, :, 2], density_source, dt)
+    grid[:, :, 1] = diffuse_gauss_seidel(grid[:, :, 1], visc, dt)
+    grid[:, :, 2] = diffuse_gauss_seidel(grid[:, :, 2], visc, dt)
+    grid = project(grid)
+    grid = advect(grid, 1, dt)
+    grid = advect(grid, 2, dt)
+    grid = project(grid)
