@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-
+import time
 
 N = 64 # Grid size
 dt = 0.1 # Time step
@@ -38,7 +38,7 @@ def diffuse_gauss_seidel(D0, diff, dt, iterations=20):
         for i in range(1, N-1):
             for j in range(1, N-1):
                 D[i, j] = (D0[i, j] + a * (D[i-1, j] + D[i+1, j] + D[i, j-1] + D[i, j+1])) / (1 + 4 * a)
-    set_boundary_conditions(D)
+    #set_boundary_conditions(D)
     return D
 
 def advect(D0, index_, dt):
@@ -58,7 +58,7 @@ def advect(D0, index_, dt):
             s1, t1 = x - i0, y - j0
             s0, t0 = 1 - s1, 1 - t1
             D0[i, j, index_] = (s0 * (t0 * D0[i0, j0, index_] + t1 * D0[i0, j1, index_]) + s1 * (t0 * D0[i1, j0, index_] + t1 * D0[i1, j1, index_]))
-    set_boundary_conditions(D0[:, :, index_])
+    #set_boundary_conditions(D0[:, :, index_])
     return D0
 
 def project(D0, iterations=20):
@@ -73,28 +73,36 @@ def project(D0, iterations=20):
         for j in range(1, N-1):
             div[i, j] = -0.5 * h * (u[i + 1, j] - u[i - 1, j] + v[i, j + 1] - v[i, j - 1])
     
-    set_boundary_conditions(div)
-    set_boundary_conditions(p)
+    #set_boundary_conditions(div)
+    #set_boundary_conditions(p)
     
     for _ in range(iterations):
         for i in range(1, N-1):
             for j in range(1, N-1):
                 p[i, j] = (div[i, j] + p[i - 1, j] + p[i + 1, j] + p[i, j - 1] + p[i, j + 1]) / 4
     
-        set_boundary_conditions(p)
+        #set_boundary_conditions(p)
     
     for i in range(1, N-1):
         for j in range(1, N-1):
             u[i, j] -= 0.5 * (p[i + 1, j] - p[i - 1, j]) / h
             v[i, j] -= 0.5 * (p[i, j + 1] - p[i, j - 1]) / h
     
-    set_boundary_conditions(u)
-    set_boundary_conditions(v)
+    #set_boundary_conditions(u)
+    #set_boundary_conditions(v)
     return D0
 
 
 density_source = np.zeros(grid.shape[:2])
-density_source[0, 0] = 1
+density_source[24, 24] = 1
+
+# print(density_source)
+# grid[:, :, 0] = add_source(grid[:, :, 0], density_source, dt)
+# print(grid[:, :, 0])
+# grid[:, :, 0] = diffuse_gauss_seidel(grid[:, :, 0], diff, dt)
+# print(grid[:, :, 0])
+# grid = advect(grid, 0, dt)
+# print(grid[:, :, 0])
 
 while True:
     # update density
@@ -110,6 +118,9 @@ while True:
     grid = advect(grid, 1, dt)
     grid = advect(grid, 2, dt)
     grid = project(grid)
-    print(grid[:, :, 0])
-    plt.imshow(grid[:, :, 0])
+    #print(grid[:, :, 0])
+    print(f'0: {np.max(grid[:, :, 0])}')
+    print(f'1: {np.max(grid[:, :, 1])}')
+    print(f'2: {np.max(grid[:, :, 2])}')
+    plt.imshow(grid[:, :, 0], cmap='gray')
     plt.show()
