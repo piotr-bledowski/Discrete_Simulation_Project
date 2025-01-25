@@ -5,8 +5,8 @@ from matplotlib.animation import FuncAnimation
 # Grid and simulation parameters
 N = 64  # Grid size
 dt = 0.1  # Time step
-diff = 0.0001  # Diffusion rate
-visc = 0.0001  # Viscosity
+diff = 0.001  # Diffusion rate
+visc = 0.001  # Viscosity
 grid = np.zeros((N, N, 3))  # Initialize density and velocity grids
 
 # Initialize source term, interaction variables, and force timers
